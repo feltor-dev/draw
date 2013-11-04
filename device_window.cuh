@@ -121,8 +121,22 @@ void GLFWCALL WindowResize( int w, int h)
     glViewport( 0, 0, (GLsizei) w, h);
 }
 
+/**
+ * @brief Draw a Window that uses data from your cuda computations
+
+ * The aim of this class is to provide an interface to make 
+ * the plot of a 2D vector during CUDA computations as simple as possible. 
+ * Uses glfw and the cuda_gl_interop functionality
+ * @note not tested yet
+ */
 struct DeviceWindow
 {
+    /**
+     * @brief Open a window
+     *
+     * @param width in pixel
+     * @param height in pixel
+     */
     DeviceWindow( int width, int height) { 
         resource = NULL;
         Nx_ = Ny_ = 0;
@@ -132,6 +146,9 @@ struct DeviceWindow
         glClear(GL_COLOR_BUFFER_BIT);
         glfwSetWindowSizeCallback( WindowResize);
     }
+    /**
+     * @brief free resources
+     */
     ~DeviceWindow( ) {
         if( resource != NULL){
             cudaGraphicsUnregisterResource( resource); 
@@ -141,6 +158,21 @@ struct DeviceWindow
         //terminate glfw
         glfwTerminate();
     }
+    /**
+     * @brief Draw a 2D field in the open window
+     *
+     * The first element of the given vector corresponds to the bottom left corner. (i.e. the 
+     * origin of a 2D coordinate system) Successive
+     * elements correspond to points from left to right and from bottom to top.
+     * @note If multiplot is set the field will be drawn in the current active 
+     * box. When all boxes are full the picture will be drawn on screen and 
+     * the top left box is active again. The title is reset.
+     * @tparam T The datatype of your elements
+     * @param x Elements to be drawn lying on the device
+     * @param Nx # of x points to be used ( the width)
+     * @param Ny # of y points to be used ( the height)
+     * @param map The colormap used to compute color from elements
+     */
     template< class T>
     void draw( const thrust::device_vector<T>& x, unsigned Nx, unsigned Ny, dg::ColorMapRedBlueExt& map)
     {
@@ -172,8 +204,8 @@ struct DeviceWindow
         glfwSwapBuffers();
     }
   private:
-    Window( const Window&);
-    Window& operator=( const Window&);
+    DeviceWindow( const DeviceWindow&);
+    DeviceWindow& operator=( const DeviceWindow&);
     GLuint bufferID;
     cudaGraphicsResource* resource;  
     unsigned Nx_, Ny_;

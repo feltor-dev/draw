@@ -74,6 +74,7 @@ struct HostWindow
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         window_str << "Host Window\n";
     }
+
     /**
      * @brief Close window and OpenGL context
      */
