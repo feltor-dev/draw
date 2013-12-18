@@ -100,19 +100,22 @@ struct HostWindow
     {
         if( Nx != Nx_ || Ny != Ny_) {
             Nx_ = Nx; Ny_ = Ny;
-            //std::cout << "Allocate resources for drawing!\n";
+            std::cout << "Allocate resources for drawing!\n";
             resource.resize( Nx*Ny);
         }
-#ifdef DG_DEBUG
         assert( x.size() == resource.size());
-#endif //DG_DEBUG
         unsigned i = k/J, j = k%J;
         //map colors
+        //toefl::Timer t;
+        //t.tic();
         std::transform( x.begin(), x.end(), resource.begin(), map);
+        //t.toc();
+        //std::cout << "Color mapping took "<<t.diff()*1000.<<"ms\n";
         //load texture
         float slit = 2./500.; //half distance between pictures in units of width
         float x0 = -1. + (float)2*j/(float)J, x1 = x0 + 2./(float)J, 
               y1 =  1. - (float)2*i/(float)I, y0 = y1 - 2./(float)I;
+        //t.tic();
         drawTexture( Nx, Ny, x0 + slit, x1 - slit, y0 + slit, y1 - slit);
         if( k == (I*J-1) )
         {
@@ -124,6 +127,8 @@ struct HostWindow
         }
         else
             k++;
+        //t.toc();
+        //std::cout << "Texture mapping took "<<t.diff()*1000.<<"ms\n";
     }
     /**
      * @brief Set up multiple plots in one window

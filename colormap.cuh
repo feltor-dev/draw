@@ -7,7 +7,7 @@
 #ifndef _DG_TEXTURE_
 #define _DG_TEXTURE_
 
-namespace dg{
+namespace draw{
 /*! @addtogroup utilities
  * @{
  */
@@ -31,7 +31,7 @@ struct ColorMapRedBlueExt
     float scale() const { return scale_;} 
   private:
     float scale_; 
-    Color M[384];
+    //Color M[384];
 };
 
 
@@ -42,6 +42,7 @@ struct ColorMapRedBlueExt
 __host__ __device__
 ColorMapRedBlueExt::ColorMapRedBlueExt( float scale): scale_(scale)
 {
+    /*
     float scal = 1.0/64.0;
     for ( int i=0; i < 64; i++) {
         M[i].r = 0.0;
@@ -74,6 +75,7 @@ ColorMapRedBlueExt::ColorMapRedBlueExt( float scale): scale_(scale)
         M[i+320].b = 0.0;
     }
     M[383].b = 5.0;
+    */
 }
 
 
@@ -112,5 +114,5 @@ __host__ Color ColorMapRedBlueExt::operator()( float x)
 
 ///@}
 
-} //namespace dg 
+} //namespace draw
 #endif // _DG_TEXTURE_

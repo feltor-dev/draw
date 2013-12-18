@@ -1,9 +1,10 @@
+
 #include <iostream>
-#include <vector>
+#include <thrust/host_vector.h>
+#include <thrust/device_vector.h>
 
-#include "../toefl/inc/toefl/timer.h"
-#include "host_window.h"
-
+#include "../toefl/inc/dg/timer.cuh"
+#include "device_window.cuh"
 /**
  * @brief Functor returning a gaussian
  * \f[
@@ -21,7 +22,7 @@ struct Gaussian
      * @param sigma_y y - variance 
      * @param amp Amplitude
      */
-    Gaussian( double x0, double y0, double sigma_x, double sigma_y, double amp)
+    Gaussian( float x0, float y0, float sigma_x, float sigma_y, float amp)
         : x00(x0), y00(y0), sigma_x(sigma_x), sigma_y(sigma_y), amplitude(amp){}
     /**
      * @brief Return the value of the gaussian
@@ -34,31 +35,32 @@ struct Gaussian
      *
      * @return gaussian
      */
-    double operator()(double x, double y)
+    float operator()(float x, float y)
     {
         return  amplitude*
                    exp( -((x-x00)*(x-x00)/2./sigma_x/sigma_x +
                           (y-y00)*(y-y00)/2./sigma_y/sigma_y) );
     }
   private:
-    double  x00, y00, sigma_x, sigma_y, amplitude;
+    float  x00, y00, sigma_x, sigma_y, amplitude;
 
 };
 
 const unsigned Nx = 7000, Ny = 4000;
-const double lx = 2., ly = 1.;
-const double hx = lx/(double)Nx, hy = ly/(double)Ny;
+const float lx = 2., ly = 1.;
+const float hx = lx/(float)Nx, hy = ly/(float)Ny;
 
 int main()
 {
     //Create Window and set window title
-    draw::HostWindow w( 800, 400);
+    draw::DeviceWindow w( 800, 400);
     // generate a vector on the grid to visualize 
     Gaussian g( 1.2, 0.3, .1, .1, 1);
-    std::vector<float> visual(Nx*Ny);
+    thrust::host_vector<float> visual(Nx*Ny);
     for(unsigned i=0; i<Ny; i++)
         for( unsigned j=0; j<Nx; j++)
-            visual[i*Nx+j] = -g( (double)j*hx, (double)i*hy);
+            visual[i*Nx+j] = -g( (float)j*hx, (float)i*hy);
+    thrust::device_vector<float> dvisual = visual;
 
     //create a colormap
     draw::ColorMapRedBlueExt colors( 1.);
@@ -66,12 +68,12 @@ int main()
     colors.scale() =  1.;
 
     int running = GL_TRUE;
-    toefl::Timer t;
+    dg::Timer t;
     while (running)
     {
         w.title() << "Hello world\n";
         t.tic();
-        w.draw( visual, Nx, Ny, colors);
+        w.draw( dvisual, Nx, Ny, colors);
         t.toc();
         std::cout << "Drawing took "<<t.diff()*1000.<<"ms\n";
         glfwWaitEvents();
