@@ -33,7 +33,7 @@ struct RenderDeviceData
      * @param height in pixel
      */
     RenderDeviceData( int rows, int cols) { 
-        resource = NULL;
+        resource_ = 0;
         Nx_ = Ny_ = 0;
         I = rows; J = cols;
         k = 0;
@@ -46,8 +46,8 @@ struct RenderDeviceData
      * @brief free resources
      */
     ~RenderDeviceData( ) {
-        if( resource != NULL){
-            cudaGraphicsUnregisterResource( resource); 
+        if( resource_ != NULL){
+            cudaGraphicsUnregisterResource( resource_); 
             //free the opengl buffer
             glDeleteBuffers( 1, &bufferID);
         }
@@ -86,15 +86,15 @@ struct RenderDeviceData
     {
         if( Nx != Nx_ || Ny != Ny_) {
             Nx_ = Nx; Ny_ = Ny;
-            cudaGraphicsUnregisterResource( resource);
-            //std::cout << "Allocate resources for drawing!\n";
+            cudaGraphicsUnregisterResource( resource_);
+            std::cout << "Allocate resources for drawing!\n";
             //free opengl buffer
             GLint id; 
             glGetIntegerv( GL_PIXEL_UNPACK_BUFFER_BINDING, &id);
             bufferID = (GLuint)id;
             glDeleteBuffers( 1, &bufferID);
             //allocate new buffer
-            resource = allocateCudaGlBuffer( 3*Nx*Ny);
+            allocateCudaGlBuffer( 3*Nx*Ny);
             glGetIntegerv( GL_PIXEL_UNPACK_BUFFER_BINDING, &id);
             bufferID = (GLuint)id;
         }
@@ -103,7 +103,8 @@ struct RenderDeviceData
         unsigned i = k/J, j = k%J;
         //map colors
         //t.tic();
-        mapColors( map, x, resource);
+        std::cout << "Hello world!\n";
+        mapColors( map, x);
         //t.toc();
         //std::cout << "Color mapping took "<<t.diff()*1000.<<"ms\n";
         float slit = 2./500.; //half distance between pictures in units of width
@@ -111,6 +112,7 @@ struct RenderDeviceData
               y1 =  1. - (float)2*i/(float)I, y0 = y1 - 2./(float)I;
         //t.tic();
         drawTexture( Nx, Ny, x0 + slit, x1 - slit, y0 + slit, y1 - slit);
+        std::cout << "Hello again!\n";
         //t.toc();
         //std::cout << "Texture mapping took "<<t.diff()*1000.<<"ms\n";
         if( k == (I*J-1) )
@@ -122,7 +124,7 @@ struct RenderDeviceData
   private:
     unsigned I, J, k;
     GLuint bufferID;
-    cudaGraphicsResource* resource;  
+    cudaGraphicsResource* resource_;  
     unsigned Nx_, Ny_;
     void drawTexture( unsigned Nx, unsigned Ny, float x0, float x1, float y0, float y1)
     {
@@ -137,29 +139,43 @@ struct RenderDeviceData
         glEnd();
     }
     template< class T>
-    void mapColors( const draw::ColorMapRedBlueExt& map, const thrust::device_vector<T>& x, cudaGraphicsResource* resource)
+    void mapColors( const draw::ColorMapRedBlueExt& map, const thrust::device_vector<T>& x)
     {
+        std::cout << "Hello map!\n";
         //dg::Timer t;
         draw::Color* d_buffer;
         size_t size;
         //Map resource into CUDA memory space
         //t.tic();
-        cudaGraphicsMapResources( 1, &resource, 0);//timing of this may include draw times
+        cudaError_t error;
+        error = cudaGraphicsMapResources( 1, &resource_, 0);//timing of this may include draw times
+        if( error != cudaSuccess){
+            std::cerr << cudaGetErrorString( error); }
         //t.toc();
         //std::cout << "1 took "<<t.diff()*1000.<<"ms\n";
         // get a pointer to the mapped resource
         //t.tic();
-        cudaGraphicsResourceGetMappedPointer( (void**)&d_buffer, &size, resource);
+        error = cudaGraphicsResourceGetMappedPointer( (void**)&d_buffer, &size, resource_);
+        if( error != cudaSuccess){
+            std::cerr << cudaGetErrorString( error); }
         //t.toc();
         //std::cout << "2 took "<<t.diff()*1000.<<"ms\n";
         assert( x.size() == size/3/sizeof(float));
         //t.tic();
-        thrust::transform( x.begin(), x.end(), thrust::device_pointer_cast( d_buffer), map);
+        int device;
+        cudaDeviceSynchronize();
+        error = cudaGetDevice(&device); 
+        if( error != cudaSuccess){
+            std::cerr << cudaGetErrorString( error); }
+        std::cout <<device<<std::endl;
+        thrust::transform( x.begin(), x.end(), thrust::device_pointer_cast<draw::Color>( d_buffer), map);
         //t.toc();
         //std::cout << "3 took "<<t.diff()*1000.<<"ms\n";
         //t.tic();
         //unmap the resource before OpenGL uses it
-        cudaGraphicsUnmapResources( 1, &resource, 0);
+        error = cudaGraphicsUnmapResources( 1, &resource_, 0);
+        if( error != cudaSuccess){
+            std::cerr << cudaGetErrorString( error); }
         //t.toc();
         //std::cout << "4 took "<<t.diff()*1000.<<"ms\n";
     }
@@ -199,16 +215,15 @@ struct RenderDeviceData
     }
 
     //N should be 3*Nx*Ny
-    cudaGraphicsResource* allocateCudaGlBuffer( unsigned N )
+    void allocateCudaGlBuffer( unsigned N )
     {
-        cudaGraphicsResource* resource;
         GLuint bufferID = allocateGlBuffer( N);
         //register the resource i.e. tell CUDA and OpenGL that buffer is used by both
         cudaError_t error;
-        error = cudaGraphicsGLRegisterBuffer( &resource, bufferID, cudaGraphicsRegisterFlagsWriteDiscard); 
+        cudaDeviceSynchronize();
+        error = cudaGraphicsGLRegisterBuffer( &resource_, bufferID, cudaGraphicsRegisterFlagsWriteDiscard); 
         if( error != cudaSuccess){
-            std::cout << cudaGetErrorString( error); return NULL;}
-        return resource;
+            std::cout << cudaGetErrorString( error); }
     }
 };
 
