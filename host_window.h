@@ -6,20 +6,17 @@
 #include <algorithm>  //transform 
 #include <vector>
 #include <sstream>
-#include <GL/glfw.h>
 //#include "../lib/timer.h"
 
+#include "utility.h"
 #include "colormap.h"
 
 //maybe in future Qt is an alternative
 namespace draw
 {
 
-void GLFWCALL WindowResize( int w, int h)
-{
-    // map coordinates to the whole window
-    glViewport( 0, 0, (GLsizei) w, h);
-}
+
+
 
 /**
  * @brief A window for 2d scientific plots 
@@ -47,41 +44,27 @@ void GLFWCALL WindowResize( int w, int h)
  * }
  * @endcode
  */
-struct HostWindow
+struct RenderHostData
 {
 	/**
-	 * @brief Open window
+	 * @brief Init GL texturing and multiplot
 	 *
-	 * @param width in pixels
-	 * @param height in pixels
+	 * @param rows # of rows of quads in one scene
+	 * @param cols # of columns of quads in the scene
 	 */
-    HostWindow( int width, int height){
+    RenderHostData( int rows, int cols){
         Nx_ = Ny_ = 0;
-        I = J = 1;
+        I = rows; J = cols;
         k = 0;
-        // create window and OpenGL context bound to it
-        if( !glfwInit()) { std::cerr << "ERROR: glfw couldn't initialize.\n";}
-        if( !glfwOpenWindow( width, height,  0,0,0,  0,0,0, GLFW_WINDOW))
-        { 
-            std::cerr << "ERROR: glfw couldn't open window!\n";
-        }
-        glfwSetWindowSizeCallback( WindowResize);
-        int major, minor, rev;
-        glfwGetVersion( &major, &minor, &rev);
-        std::cout << "Using GLFW version   "<<major<<"."<<minor<<"."<<rev<<"\n";
         //enable textures
         glEnable(GL_TEXTURE_2D);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        window_str << "Host Window\n";
+        //window_str << "\n";
     }
 
-    /**
-     * @brief Close window and OpenGL context
-     */
-    ~HostWindow() { glfwTerminate();}
     //Vector has to be useable in std functions
     /**
-     * @brief Draw a 2D field in the open window
+     * @brief Render a 2D field in the open window
      *
      * The first element of the given vector corresponds to the bottom left corner. (i.e. the 
      * origin of a 2D coordinate system) Successive
@@ -96,7 +79,7 @@ struct HostWindow
      * @param map The colormap used to compute color from elements
      */
     template< class Vector>
-    void draw( const Vector& x, unsigned Nx, unsigned Ny, draw::ColorMapRedBlueExt& map)
+    void renderQuad( const Vector& x, unsigned Nx, unsigned Ny, draw::ColorMapRedBlueExt& map)
     {
         if( Nx != Nx_ || Ny != Ny_) {
             Nx_ = Nx; Ny_ = Ny;
@@ -118,46 +101,28 @@ struct HostWindow
         //t.tic();
         drawTexture( Nx, Ny, x0 + slit, x1 - slit, y0 + slit, y1 - slit);
         if( k == (I*J-1) )
-        {
-            //gehört das hier rein??
-            glfwSetWindowTitle( (window_str.str()).c_str() );
-            window_str.str(""); //clear title string
-            glfwSwapBuffers();
             k = 0;
-        }
         else
             k++;
         //t.toc();
         //std::cout << "Texture mapping took "<<t.diff()*1000.<<"ms\n";
     }
     /**
-     * @brief Set up multiple plots in one window
+     * @brief Set up multiple plots in one window_
      *
-     * After this call, successive calls to the draw function will draw 
+     * After this call, successive calls to the renderQuad function will draw 
      * into rectangular boxes from left to right and top to bottom.
      * @param i # of rows of boxes
      * @param j # of columns of boxes
      * @code 
      * w.set_multiplot( 1,2); //set up two boxes next to each other
-     * w.draw( first, 100 ,100, map); //draw in left box
-     * w.draw( second, 100 ,100, map); //draw in right box
+     * w.renderQuad( first, 100 ,100, map); //draw in left box
+     * w.renderQuad( second, 100 ,100, map); //draw in right box
      * @endcode
      */
     void set_multiplot( unsigned i, unsigned j) { I = i; J = j; k = 0;}
-    /**
-     * @brief The title stream
-     *
-     * The title is cleared after every call to draw!
-     * @code
-        HostWindow w(400, 400);
-        w.title() << "Hello window!";
-     * @endcode
-     * @return The current window title
-     */
-    std::stringstream& title() { return window_str;}
+
   private:
-    HostWindow( const HostWindow&);
-    HostWindow& operator=( const HostWindow&);
     unsigned I, J, k;
     void drawTexture( unsigned Nx, unsigned Ny, float x0, float x1, float y0, float y1)
     {
@@ -173,7 +138,6 @@ struct HostWindow
     }
     unsigned Nx_, Ny_;
     std::vector<Color> resource;
-    std::stringstream window_str;  //window name
 };
 } //namespace draw
 

@@ -3,7 +3,7 @@ NVCC = nvcc
 CFLAGS = -Wall -lm -O3 
 NVCCFLAGS = --compiler-options -Wall -arch=sm_20 -O3
 #you might check the libs here, cf your glfw installation
-GLFLAGS   = -lglfw -lXxf86vm -lXext -lX11 -lGLU  -lGL -lpthread 
+GLFLAGS   = -lglfw3 -lXxf86vm -lXext -lX11 -lGLU  -lGL -lpthread -lXrandr -lXi
 
 
 all: host_window_t device_window_t

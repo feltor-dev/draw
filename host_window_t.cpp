@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 
-#include "../toefl/inc/toefl/timer.h"
 #include "host_window.h"
 
 /**
@@ -46,13 +45,14 @@ struct Gaussian
 };
 
 const unsigned Nx = 7000, Ny = 4000;
-const double lx = 2., ly = 1.;
+const double lx = 2., ly = 2.;
 const double hx = lx/(double)Nx, hy = ly/(double)Ny;
 
 int main()
 {
     //Create Window and set window title
-    draw::HostWindow w( 800, 400);
+    GLFWwindow* w = draw::glfwInitAndCreateWindow( 400, 800, "Hello world!");
+    draw::RenderHostData render( 2, 1);
     // generate a vector on the grid to visualize 
     Gaussian g( 1.2, 0.3, .1, .1, 1);
     std::vector<float> visual(Nx*Ny);
@@ -64,20 +64,14 @@ int main()
     draw::ColorMapRedBlueExt colors( 1.);
     //set scale
     colors.scale() =  1.;
-
-    int running = GL_TRUE;
-    toefl::Timer t;
-    while (running)
+    while (!glfwWindowShouldClose( w ))
     {
-        w.title() << "Hello world\n";
-        t.tic();
-        w.draw( visual, Nx, Ny, colors);
-        t.toc();
-        std::cout << "Drawing took "<<t.diff()*1000.<<"ms\n";
+        render.renderQuad( visual, Nx, Ny, colors);
+        render.renderQuad( visual, Nx, Ny, colors);
+        glfwSwapBuffers(w);
         glfwWaitEvents();
-        running = !glfwGetKey( GLFW_KEY_ESC) &&
-                    glfwGetWindowParam( GLFW_OPENED);
     }
+    glfwTerminate();
 
     return 0;
 }
