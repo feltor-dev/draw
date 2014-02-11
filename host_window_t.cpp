@@ -66,8 +66,8 @@ int main()
     colors.scale() =  1.;
     while (!glfwWindowShouldClose( w ))
     {
-        render.renderQuad( visual.begin(), visual.end(), Nx, Ny, colors);
-        render.renderQuad( visual.begin(), visual.end(), Nx, Ny, colors);
+        render.renderQuad( visual, Nx, Ny, colors);
+        render.renderQuad( visual, Nx, Ny, colors);
         glfwSwapBuffers(w);
         glfwWaitEvents();
     }
