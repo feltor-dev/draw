@@ -56,15 +56,15 @@ int main()
     draw::RenderDeviceData render( 1,1);
     // generate a vector on the grid to visualize 
     Gaussian g( 1.2, 0.3, .1, .1, 1);
-    thrust::host_vector<double> visual(Nx*Ny);
+    thrust::host_vector<float> visual(Nx*Ny);
     for(unsigned i=0; i<Ny; i++)
         for( unsigned j=0; j<Nx; j++)
             visual[i*Nx+j] = g( (float)j*hx, (float)i*hy);
-    thrust::device_vector<double> dvisual1 = visual;
+    thrust::device_vector<float> dvisual1 = visual;
     for(unsigned i=0; i<Ny; i++)
         for( unsigned j=0; j<Nx; j++)
             visual[i*Nx+j] = -g( (float)j*hx, (float)i*hy);
-    thrust::device_vector<double> dvisual2 = visual;
+    thrust::device_vector<float> dvisual2 = visual;
 
     //create a colormap
     draw::ColorMapRedBlueExt colors( 1.);

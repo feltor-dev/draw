@@ -6,15 +6,16 @@
 #include <GL/glew.h>
 #include <cuda_gl_interop.h>
 
+#include <thrust/version.h>
 #include <thrust/device_vector.h>
 #include <thrust/transform.h>
+#include <thrust/execution_policy.h>
 
 #include "colormap.cuh"
 #include "utility.h"
 
 namespace draw
 {
-
 
 /**
  * @brief Draw a Window that uses data from your CUDA computations
@@ -98,23 +99,14 @@ struct RenderDeviceData
             glGetIntegerv( GL_PIXEL_UNPACK_BUFFER_BINDING, &id);
             bufferID = (GLuint)id;
         }
-        //dg::Timer t;
 
         unsigned i = k/J, j = k%J;
         //map colors
-        //t.tic();
-        std::cout << "Hello world!\n";
         mapColors( map, x);
-        //t.toc();
-        //std::cout << "Color mapping took "<<t.diff()*1000.<<"ms\n";
         float slit = 2./500.; //half distance between pictures in units of width
         float x0 = -1. + (float)2*j/(float)J, x1 = x0 + 2./(float)J, 
               y1 =  1. - (float)2*i/(float)I, y0 = y1 - 2./(float)I;
-        //t.tic();
         drawTexture( Nx, Ny, x0 + slit, x1 - slit, y0 + slit, y1 - slit);
-        std::cout << "Hello again!\n";
-        //t.toc();
-        //std::cout << "Texture mapping took "<<t.diff()*1000.<<"ms\n";
         if( k == (I*J-1) )
             k = 0;
         else
@@ -141,43 +133,23 @@ struct RenderDeviceData
     template< class T>
     void mapColors( const draw::ColorMapRedBlueExt& map, const thrust::device_vector<T>& x)
     {
-        std::cout << "Hello map!\n";
-        //dg::Timer t;
         draw::Color* d_buffer;
         size_t size;
         //Map resource into CUDA memory space
-        //t.tic();
         cudaError_t error;
-        error = cudaGraphicsMapResources( 1, &resource_, 0);//timing of this may include draw times
+        error = cudaGraphicsMapResources( 1, &resource_, 0);
         if( error != cudaSuccess){
             std::cerr << cudaGetErrorString( error); }
-        //t.toc();
-        //std::cout << "1 took "<<t.diff()*1000.<<"ms\n";
         // get a pointer to the mapped resource
-        //t.tic();
         error = cudaGraphicsResourceGetMappedPointer( (void**)&d_buffer, &size, resource_);
         if( error != cudaSuccess){
             std::cerr << cudaGetErrorString( error); }
-        //t.toc();
-        //std::cout << "2 took "<<t.diff()*1000.<<"ms\n";
         assert( x.size() == size/3/sizeof(float));
-        //t.tic();
-        int device;
-        cudaDeviceSynchronize();
-        error = cudaGetDevice(&device); 
-        if( error != cudaSuccess){
-            std::cerr << cudaGetErrorString( error); }
-        std::cout <<device<<std::endl;
         thrust::transform( x.begin(), x.end(), thrust::device_pointer_cast<draw::Color>( d_buffer), map);
-        //t.toc();
-        //std::cout << "3 took "<<t.diff()*1000.<<"ms\n";
-        //t.tic();
         //unmap the resource before OpenGL uses it
         error = cudaGraphicsUnmapResources( 1, &resource_, 0);
         if( error != cudaSuccess){
             std::cerr << cudaGetErrorString( error); }
-        //t.toc();
-        //std::cout << "4 took "<<t.diff()*1000.<<"ms\n";
     }
     void cudaGlInit( )
     {
@@ -195,6 +167,9 @@ struct RenderDeviceData
         cudaGetDevice( &device);
         std::cout << "Using device number  "<<device<<"\n";
         cudaGLSetGLDevice( device ); 
+        std::cout << "Using THRUST version "<<THRUST_MAJOR_VERSION<<"."<<THRUST_MINOR_VERSION<<"."<<THRUST_SUBMINOR_VERSION<<"\n";
+        std::cout << "(thrust version should be 1.7.0)\n";
+        
 
         cudaError_t error;
         error = cudaGetLastError();
@@ -217,10 +192,12 @@ struct RenderDeviceData
     //N should be 3*Nx*Ny
     void allocateCudaGlBuffer( unsigned N )
     {
+        int device;
+        cudaGetDevice( &device);
+        std::cout << "Using device number  "<<device<<"\n";
         GLuint bufferID = allocateGlBuffer( N);
         //register the resource i.e. tell CUDA and OpenGL that buffer is used by both
         cudaError_t error;
-        cudaDeviceSynchronize();
         error = cudaGraphicsGLRegisterBuffer( &resource_, bufferID, cudaGraphicsRegisterFlagsWriteDiscard); 
         if( error != cudaSuccess){
             std::cout << cudaGetErrorString( error); }
