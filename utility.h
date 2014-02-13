@@ -24,7 +24,7 @@ void error_callback( int error, const char* description)
  * @param w width
  * @param h height
  */
-void WindowResize( GLFWwindow* window_, int w, int h)
+void WindowResize( GLFWwindow* window, int w, int h)
 {
     // map coordinates to the whole window
     glViewport( 0, 0, (GLsizei) w, h);
