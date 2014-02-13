@@ -16,24 +16,45 @@
 
 namespace draw
 {
+///@addtogroup Rendering
+///@{
 
 /**
- * @brief Draw a Window that uses data from your CUDA computations
+ * @brief Render Object that uses data from your CUDA computations
 
  * The aim of this class is to provide an interface to make 
  * the plot of a 2D vector during CUDA computations as simple as possible. 
- * Uses glfw and the cuda_gl_interop functionality
- * @note not tested yet
+ * Uses the cuda_gl_interop functionality
+ * @code
+ * #include <thrust/device_vector.h>
+ * #include "draw/device_window.h"
+ * 
+ * int main()
+ * {
+ *     GLFWwindow* w = draw::glfwInitAndCreateWindow w( 400, 400, "Hello world!");
+ *     RenderDeviceData render( 1,1); 
+       draw::ColorMapRedBlueExt map( 1.);
+       thrust::device_vector<double> v( 100*100);
+ *     while( !glfwWindowShouldClose(w))
+ *     {
+ *         //compute useful values for v
+           render.renderQuad( v, 100, 100, map);
+ *     }
+ *     glfwTerminate();
+ *     return 0;
+ * }
+ * @endcode
+ * \note An OpenGl context has to be created before the render object. 
  */
 struct RenderDeviceData
 {
-    /**
-     * @brief Open a window
-     *
-     * @param width in pixel
-     * @param height in pixel
-     */
-    RenderDeviceData( int rows, int cols) { 
+	/**
+	 * @brief Init Cuda - OpenGL texturing and multiplot
+	 *
+	 * @param rows # of rows of quads in one scene
+	 * @param cols # of columns of quads in the scene
+	 */
+    RenderDeviceData( int rows = 1, int cols = 1) { 
         resource_ = 0;
         Nx_ = Ny_ = 0;
         I = rows; J = cols;
@@ -56,7 +77,7 @@ struct RenderDeviceData
     /**
      * @brief Set up multiple plots in one window
      *
-     * After this call, successive calls to the draw function will draw 
+     * After this call, successive calls to the renderQuad function will draw 
      * into rectangular boxes from left to right and top to bottom.
      * @param i # of rows of boxes
      * @param j # of columns of boxes
@@ -74,8 +95,7 @@ struct RenderDeviceData
      * origin of a 2D coordinate system) Successive
      * elements correspond to points from left to right and from bottom to top.
      * @note If multiplot is set the field will be drawn in the current active 
-     * box. When all boxes are full the picture will be drawn on screen and 
-     * the top left box is active again. The title is reset.
+     * box. When all boxes are full the field will be drawn in the upper left box again. 
      * @tparam T The datatype of your elements
      * @param x Elements to be drawn lying on the device
      * @param Nx # of x points to be used ( the width)
@@ -112,8 +132,32 @@ struct RenderDeviceData
         else
             k++;
     }
+    /**
+     * @brief Render an untextured Quad
+     */
+    void renderEmptyQuad()
+    {
+        unsigned i = k/J, j = k%J;
+        float slit = 2./500.; //half distance between pictures in units of width
+        float x0 = -1. + (float)2*j/(float)J, x1 = x0 + 2./(float)J, 
+              y1 =  1. - (float)2*i/(float)I, y0 = y1 - 2./(float)I;
+        glLoadIdentity();
+        glBegin(GL_QUADS);
+             glVertex2f( x0+slit, y0+slit);
+             glVertex2f( x1-slit, y0+slit);
+             glVertex2f( x1-slit, y1-slit);
+             glVertex2f( x0+slit, y1-slit);
+        glEnd();
+        if( k == (I*J-1) )
+            k = 0;
+        else
+            k++;
+
+    }
 
   private:
+    RenderDeviceData( const RenderDeviceData&);
+    RenderDeviceData& operator=( const RenderDeviceData&);
     unsigned I, J, k;
     GLuint bufferID;
     cudaGraphicsResource* resource_;  
@@ -203,6 +247,7 @@ struct RenderDeviceData
             std::cout << cudaGetErrorString( error); }
     }
 };
+///@}
 
 } //namespace draw
 

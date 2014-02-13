@@ -3,16 +3,41 @@
 #include <GLFW/glfw3.h>
 namespace draw
 {
+///@addtogroup Utility
+///@{
+
+/**
+ * @brief Standard error callback function that prints error in error stream
+ *
+ * @param error error number 
+ * @param description string containing description
+ */
 void error_callback( int error, const char* description)
 {
     std::cerr << description<<std::endl;
 }
 
+/**
+ * @brief Standard Resize functions, remaps the viewport to the whole window
+ *
+ * @param window Window identifiere
+ * @param w width
+ * @param h height
+ */
 void WindowResize( GLFWwindow* window_, int w, int h)
 {
     // map coordinates to the whole window
     glViewport( 0, 0, (GLsizei) w, h);
 }
+/**
+ * @brief Key callback function, checks if ESC is pressed and registers window for closure
+ *
+ * @param window Window identifier
+ * @param key key
+ * @param scancode scancode
+ * @param action action
+ * @param mods mods
+ */
 void key_callback( GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -20,7 +45,7 @@ void key_callback( GLFWwindow* window, int key, int scancode, int action, int mo
 }
 
 /**
- * @brief Convenience function that inits glfw, opens a window and makes it the current context
+ * @brief Convenience function that inits glfw, opens a window and makes it the current OpenGL context
  *
  * Furthermore it sets standard window error, resize and key callbacks. 
  * @param width width of the window to open
@@ -48,4 +73,5 @@ GLFWwindow* glfwInitAndCreateWindow(int width, int height, const char* title)
     return window_;
 }
 
+///@}
 }//namespace draw
