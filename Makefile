@@ -1,6 +1,6 @@
 CC = g++
 NVCC = nvcc
-INCLUDE = -I../../include
+INCLUDE = -I../../include # thrust library
 CFLAGS = -Wall -lm -O3 
 NVCCFLAGS = --compiler-options -Wall -arch=sm_20 -O3
 #you might check the libs here, cf your glfw installation
