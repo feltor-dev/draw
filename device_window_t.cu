@@ -1,9 +1,8 @@
-
+//NOT WORKING WITH NEWER THRUST VERSION
 #include <iostream>
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
 
-#include "../toefl/inc/dg/timer.cuh"
 #include "device_window.cuh"
 /**
  * @brief Functor returning a gaussian
@@ -46,39 +45,38 @@ struct Gaussian
 
 };
 
-const unsigned Nx = 7000, Ny = 4000;
-const float lx = 2., ly = 1.;
+const unsigned Nx = 20, Ny = 10;
+const float lx = 2., ly = 2.;
 const float hx = lx/(float)Nx, hy = ly/(float)Ny;
 
 int main()
 {
     //Create Window and set window title
-    draw::DeviceWindow w( 800, 400);
+    GLFWwindow* w = draw::glfwInitAndCreateWindow( 800, 400, "Hello world!");
+    draw::RenderDeviceData render( 1,1);
     // generate a vector on the grid to visualize 
     Gaussian g( 1.2, 0.3, .1, .1, 1);
     thrust::host_vector<float> visual(Nx*Ny);
     for(unsigned i=0; i<Ny; i++)
         for( unsigned j=0; j<Nx; j++)
+            visual[i*Nx+j] = g( (float)j*hx, (float)i*hy);
+    thrust::device_vector<float> dvisual1 = visual;
+    for(unsigned i=0; i<Ny; i++)
+        for( unsigned j=0; j<Nx; j++)
             visual[i*Nx+j] = -g( (float)j*hx, (float)i*hy);
-    thrust::device_vector<float> dvisual = visual;
+    thrust::device_vector<float> dvisual2 = visual;
 
     //create a colormap
     draw::ColorMapRedBlueExt colors( 1.);
     //set scale
     colors.scale() =  1.;
 
-    int running = GL_TRUE;
-    dg::Timer t;
-    while (running)
+    while ( !glfwWindowShouldClose( w))
     {
-        w.title() << "Hello world\n";
-        t.tic();
-        w.draw( dvisual, Nx, Ny, colors);
-        t.toc();
-        std::cout << "Drawing took "<<t.diff()*1000.<<"ms\n";
+        render.renderQuad( dvisual1, Nx, Ny, colors);
+        //render.renderQuad( dvisual2, Nx, Ny, colors);
+        glfwSwapBuffers(w);
         glfwWaitEvents();
-        running = !glfwGetKey( GLFW_KEY_ESC) &&
-                    glfwGetWindowParam( GLFW_OPENED);
     }
 
     return 0;

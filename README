@@ -5,7 +5,7 @@ to realize a 2D visualisation from within source code.
 
 1. Library dependencies
 
-- the DRAW library relies on a working installation of OpenGL and glfw
+- the DRAW library relies on a working installation of OpenGL and glfw-3
         http://www.glfw.org/download.html
   (If you experience linker problems with glfw be sure you add the correct 
    libraries for your system in the Makefile in the GLFLAGS/LIBS variable.)
