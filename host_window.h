@@ -53,12 +53,14 @@ struct RenderHostData
 	 * @param cols # of columns of quads in the scene
 	 */
     RenderHostData( int rows = 1, int cols = 1){
+
         Nx_ = Ny_ = 0;
         I = rows; J = cols;
         k = 0;
         //enable textures
         glEnable(GL_TEXTURE_2D);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glClearColor( 1.,1.,1.,0.);
         //window_str << "\n";
     }
 
@@ -85,12 +87,12 @@ struct RenderHostData
             std::cout << "Allocate resources for drawing!\n";
             resource.resize( Nx*Ny);
         }
-        assert( x.size() == resource.size());
+        assert( x.size() >= resource.size());
         unsigned i = k/J, j = k%J;
         //map colors
         //toefl::Timer t;
         //t.tic();
-        std::transform( x.begin(), x.end(), resource.begin(), map);
+        std::transform( x.begin(), x.begin()+Nx*Ny, resource.begin(), map);
         //t.toc();
         //std::cout << "Color mapping took "<<t.diff()*1000.<<"ms\n";
         //load texture
@@ -115,8 +117,9 @@ struct RenderHostData
         float slit = 2./500.; //half distance between pictures in units of width
         float x0 = -1. + (float)2*j/(float)J, x1 = x0 + 2./(float)J, 
               y1 =  1. - (float)2*i/(float)I, y0 = y1 - 2./(float)I;
-        glLoadIdentity();
-        glBegin(GL_QUADS);
+        //glLoadIdentity();
+        glColor3f(1.,1.,1. );
+        glBegin( GL_QUADS);
              glVertex2f( x0+slit, y0+slit);
              glVertex2f( x1-slit, y0+slit);
              glVertex2f( x1-slit, y1-slit);
