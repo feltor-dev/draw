@@ -62,12 +62,13 @@ int main()
 
     //create a colormap
     draw::ColorMapRedBlueExt colors( 1.);
+    draw::ColorMapRedBlueExtMinMax colorsminmax( -1.,2.);
     //set scale
     colors.scale() =  1.;
     while (!glfwWindowShouldClose( w ))
     {
         render.renderQuad( visual, Nx, Ny, colors);
-        render.renderQuad( visual, Nx, Ny, colors);
+        render.renderQuad( visual, Nx, Ny, colorsminmax);
         glfwSwapBuffers(w);
         glfwWaitEvents();
     }
