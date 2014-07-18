@@ -51,10 +51,10 @@ struct ColorMapRedBlueExt
      *
      * @return The scale currently in use
      */
-    float scale() const { return scale_;} 
+    float scale() const { return scale_;}     
     
-    void initcolorarray();
   private:
+    void initcolorarray();
     float scale_; 
     Color M[384];
 };
@@ -176,8 +176,9 @@ struct ColorMapRedBlueExtMinMax
      */
     float scalemax() const { return scalemax_;}  
     
-    void initcolorarray();
+    
   private:
+    void initcolorarray();
     float scalemin_;
     float scalemax_; 
     Color M[384];
