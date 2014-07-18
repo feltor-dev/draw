@@ -77,8 +77,8 @@ struct RenderHostData
      * @param Ny # of y points to be used ( the height)
      * @param map The colormap used to compute color from elements
      */
-    template< class Vector>
-    void renderQuad( const Vector& x, unsigned Nx, unsigned Ny, draw::ColorMapRedBlueExt& map)
+    template< class Vector, class ColorMap >
+    void renderQuad( const Vector& x, unsigned Nx, unsigned Ny,ColorMap& map)
     {
         if( Nx != Nx_ || Ny != Ny_) {
             Nx_ = Nx; Ny_ = Ny;
