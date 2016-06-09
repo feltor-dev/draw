@@ -129,9 +129,13 @@ void ColorMapRedBlueExt::initcolorarray() {
     }
     M[383].b = 5.0;
 }
+/*! @addtogroup Utility
+ * @{
+ */
 /**
  * @brief A Colormap from black - blue  over white to red and gold with
  * arbitrary minumum and maximum value
+
  */
 struct ColorMapRedBlueExtMinMax
 {
@@ -234,5 +238,6 @@ void ColorMapRedBlueExtMinMax::initcolorarray() {
     }
     M[383].b = 5.0;
 }
+///@}
 } //namespace draw
 #endif // _DG_TEXTURE_
