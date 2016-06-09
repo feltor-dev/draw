@@ -1,10 +1,10 @@
 CC = g++
 NVCC = nvcc
-INCLUDE = -I/home/markus/Dokumente/phd/include # thrust library
+INCLUDE = -I$(HOME)/include
 CFLAGS = -Wall -lm -O3 
 NVCCFLAGS = --compiler-options -Wall -arch=sm_20 -O3
 #you might check the libs here, cf your glfw installation
-GLFLAGS   = -lglfw3 -lXxf86vm -lXext -lX11 -lGLU  -lGL -lpthread -lXrandr -lXi
+GLFLAGS =$$(pkg-config --static --libs glfw3) #glfw3 installation
 
 
 all: host_window_t device_window_t

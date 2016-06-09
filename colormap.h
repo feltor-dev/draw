@@ -180,7 +180,7 @@ struct ColorMapRedBlueExtMinMax
      */
     float scalemax() const { return scalemax_;}  
     
-    
+
   private:
     void initcolorarray();
     float scalemin_;
