@@ -51,7 +51,7 @@ struct ColorMapRedBlueExt
      *
      * @return The scale currently in use
      */
-    float scale() const { return scale_;} 
+    float scale() const { return scale_;}     
     
   private:
     void initcolorarray();
@@ -129,9 +129,13 @@ void ColorMapRedBlueExt::initcolorarray() {
     }
     M[383].b = 5.0;
 }
+/*! @addtogroup Utility
+ * @{
+ */
 /**
  * @brief A Colormap from black - blue  over white to red and gold with
  * arbitrary minumum and maximum value
+
  */
 struct ColorMapRedBlueExtMinMax
 {
@@ -176,6 +180,7 @@ struct ColorMapRedBlueExtMinMax
      */
     float scalemax() const { return scalemax_;}  
     
+
   private:
     void initcolorarray();
     float scalemin_;
@@ -233,5 +238,6 @@ void ColorMapRedBlueExtMinMax::initcolorarray() {
     }
     M[383].b = 5.0;
 }
+///@}
 } //namespace draw
 #endif // _DG_TEXTURE_
