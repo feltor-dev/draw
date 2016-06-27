@@ -3,6 +3,7 @@ NVCC = nvcc
 INCLUDE = -I$(HOME)/include
 CFLAGS = -Wall -lm -O3 
 NVCCFLAGS = --compiler-options -Wall -arch=sm_20 -O3
+NVCCFLAGS +=-D_FORCE_INLINES # workaround for bug in cuda 7.5 in conjunction with string.h of glibc 2.23
 #you might check the libs here, cf your glfw installation
 GLFLAGS =$$(pkg-config --static --libs glfw3) #glfw3 installation
 
