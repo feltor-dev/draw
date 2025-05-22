@@ -6,10 +6,8 @@
 #include <GL/glew.h>
 #include <cuda_gl_interop.h>
 
-#include <thrust/version.h>
 #include <thrust/device_vector.h>
 #include <thrust/transform.h>
-#include <thrust/execution_policy.h>
 
 #include "colormap.cuh"
 #include "utility.h"
