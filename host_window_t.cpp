@@ -6,7 +6,7 @@
 /**
  * @brief Functor returning a gaussian
  * \f[
-   f(x,y) = Ae^{-(\frac{(x-x_0)^2}{2\sigma_x^2} + \frac{(y-y_0)^2}{2\sigma_y^2}} 
+   f(x,y) = Ae^{-(\frac{(x-x_0)^2}{2\sigma_x^2} + \frac{(y-y_0)^2}{2\sigma_y^2}}
    \f]
  */
 struct Gaussian
@@ -17,7 +17,7 @@ struct Gaussian
      * @param x0 x-center-coordinate
      * @param y0 y-center-coordinate
      * @param sigma_x x - variance
-     * @param sigma_y y - variance 
+     * @param sigma_y y - variance
      * @param amp Amplitude
      */
     Gaussian( double x0, double y0, double sigma_x, double sigma_y, double amp)
@@ -26,7 +26,7 @@ struct Gaussian
      * @brief Return the value of the gaussian
      *
      * \f[
-       f(x,y) = Ae^{-(\frac{(x-x_0)^2}{2\sigma_x^2} + \frac{(y-y_0)^2}{2\sigma_y^2}} 
+       f(x,y) = Ae^{-(\frac{(x-x_0)^2}{2\sigma_x^2} + \frac{(y-y_0)^2}{2\sigma_y^2}}
        \f]
      * @param x x - coordinate
      * @param y y - coordinate
@@ -53,7 +53,7 @@ int main()
     //Create Window and set window title
     GLFWwindow* w = draw::glfwInitAndCreateWindow( 400, 800, "Hello world!");
     draw::RenderHostData render( 2, 1);
-    // generate a vector on the grid to visualize 
+    // generate a vector on the grid to visualize
     Gaussian g( 1.2, 0.3, .1, .1, 1);
     std::vector<float> visual(Nx*Ny);
     for(unsigned i=0; i<Ny; i++)

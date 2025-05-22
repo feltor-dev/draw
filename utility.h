@@ -9,22 +9,21 @@ namespace draw
 /**
  * @brief Standard error callback function that prints error in error stream
  *
- * @param error error number 
+ * @param error error number
  * @param description string containing description
  */
 void error_callback( int error, const char* description)
 {
-    std::cerr << description<<std::endl;
+    std::cerr << error << " "<<description<<std::endl;
 }
 
 /**
  * @brief Standard Resize functions, remaps the viewport to the whole window
  *
- * @param window Window identifiere
  * @param w width
  * @param h height
  */
-void WindowResize( GLFWwindow* window, int w, int h)
+void WindowResize( GLFWwindow* , int w, int h)
 {
     // map coordinates to the whole window
     glViewport( 0, 0, (GLsizei) w, h);
@@ -34,11 +33,9 @@ void WindowResize( GLFWwindow* window, int w, int h)
  *
  * @param window Window identifier
  * @param key key
- * @param scancode scancode
  * @param action action
- * @param mods mods
  */
-void key_callback( GLFWwindow* window, int key, int scancode, int action, int mods)
+void key_callback( GLFWwindow* window, int key, int , int action, int )
 {
     if( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose( window, GL_TRUE);
@@ -47,7 +44,7 @@ void key_callback( GLFWwindow* window, int key, int scancode, int action, int mo
 /**
  * @brief Convenience function that inits glfw, opens a window and makes it the current OpenGL context
  *
- * Furthermore it sets standard window error, resize and key callbacks. 
+ * Furthermore it sets standard window error, resize and key callbacks.
  * @param width width of the window to open
  * @param height height of the window to open
  * @param title initial title of the window

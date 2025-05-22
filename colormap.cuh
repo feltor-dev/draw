@@ -15,9 +15,9 @@ namespace draw{
 /*! @brief POD that contains RGB values for 256 colors*/
 struct Color
 {
-    float r; //!< R contains red value for color 
-    float g; //!< G contains green value for color 
-    float b; //!< B contains blue value for color 
+    float r; //!< R contains red value for color
+    float g; //!< G contains green value for color
+    float b; //!< B contains blue value for color
 };
 
 /**
@@ -26,7 +26,7 @@ struct Color
 struct ColorMapRedBlueExt
 {
 /*! @brief Create an extended redblue colormap
-    
+
     the extra colors are black beyond the blue and gold in the infrared
     @param scale The scale specifies which value corresponds to red
      	(-scale corresponds to blue, 0 to white)
@@ -52,15 +52,15 @@ struct ColorMapRedBlueExt
      *
      * @return The scale currently in use
      */
-    float scale() const { return scale_;} 
+    float scale() const { return scale_;}
   private:
-    float scale_; 
+    float scale_;
     //Color M[384];
 };
 
 
 /*! @brief Create an extended redblue colormap with 384 floats
-    
+
     the extra colors are black beyond the blue and gold in the infrared
  */
 __host__ __device__

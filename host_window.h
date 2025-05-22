@@ -3,7 +3,7 @@
 
 #include <cassert>
 
-#include <algorithm>  //transform 
+#include <algorithm>  //transform
 #include <vector>
 #include <sstream>
 //#include "../lib/timer.h"
@@ -19,10 +19,10 @@ namespace draw
 ///@{
 
 /**
- * @brief Render object for 2d scientific plots 
+ * @brief Render object for 2d scientific plots
  *
- * The intention of this class is to provide an interface to make 
- * the plot of a 2D vector during computations as simple as possible. 
+ * The intention of this class is to provide an interface to make
+ * the plot of a 2D vector during computations as simple as possible.
  * To use it simply use something like
  * @code
  * #include "draw/host_window.h"
@@ -42,7 +42,7 @@ namespace draw
  *     return 0;
  * }
  * @endcode
- * \note An OpenGl context has to be created before the render object. 
+ * \note An OpenGl context has to be created before the render object.
  */
 struct RenderHostData
 {
@@ -68,11 +68,11 @@ struct RenderHostData
     /**
      * @brief Render a 2D field in the open window
      *
-     * The first element of the given vector corresponds to the bottom left corner. (i.e. the 
+     * The first element of the given vector corresponds to the bottom left corner. (i.e. the
      * origin of a 2D coordinate system) Successive
      * elements correspond to points from left to right and from bottom to top.
-     * @note If multiplot is set the field will be drawn in the current active 
-     * box. When all boxes are full the field will be drawn in the upper left box again. 
+     * @note If multiplot is set the field will be drawn in the current active
+     * box. When all boxes are full the field will be drawn in the upper left box again.
      * @tparam Vector The container class of your elements
      * @param x Elements to be drawn
      * @param Nx # of x points to be used ( the width)
@@ -97,7 +97,7 @@ struct RenderHostData
         //std::cout << "Color mapping took "<<t.diff()*1000.<<"ms\n";
         //load texture
         float slit = 2./500.; //half distance between pictures in units of width
-        float x0 = -1. + (float)2*j/(float)J, x1 = x0 + 2./(float)J, 
+        float x0 = -1. + (float)2*j/(float)J, x1 = x0 + 2./(float)J,
               y1 =  1. - (float)2*i/(float)I, y0 = y1 - 2./(float)I;
         //t.tic();
         drawTexture( Nx, Ny, x0 + slit, x1 - slit, y0 + slit, y1 - slit);
@@ -115,7 +115,7 @@ struct RenderHostData
     {
         unsigned i = k/J, j = k%J;
         float slit = 2./500.; //half distance between pictures in units of width
-        float x0 = -1. + (float)2*j/(float)J, x1 = x0 + 2./(float)J, 
+        float x0 = -1. + (float)2*j/(float)J, x1 = x0 + 2./(float)J,
               y1 =  1. - (float)2*i/(float)I, y0 = y1 - 2./(float)I;
         //glLoadIdentity();
         glColor3f(1.,1.,1. );
@@ -134,11 +134,11 @@ struct RenderHostData
     /**
      * @brief Set up multiple plots in one window_
      *
-     * After this call, successive calls to the renderQuad function will draw 
+     * After this call, successive calls to the renderQuad function will draw
      * into rectangular boxes from left to right and top to bottom.
      * @param i # of rows of boxes
      * @param j # of columns of boxes
-     * @code 
+     * @code
      * w.set_multiplot( 1,2); //set up two boxes next to each other
      * w.renderQuad( first, 100 ,100, map); //draw in left box
      * w.renderQuad( second, 100 ,100, map); //draw in right box
